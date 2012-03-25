@@ -46,6 +46,7 @@ void setup(void) {
   Events.addHandler(buttonHandler,  100);
   Events.addHandler(clockHandler,  1000);
   Events.addHandler(lcdHandler,     100);
+  Events.addHandler(mqttHandler,    250);                // ToDo: Adjust timing
   Events.addHandler(serialHandler,  100);
 }
 

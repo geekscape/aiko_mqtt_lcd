@@ -86,32 +86,6 @@ void commandGet(void) {
   eventLog("get()");
 
 //Serial.println(& message[argumentIndex]);
-
-  char mqttClientId[16];
-  byte octets[6];
-
-  getStringEEPROM("mqttClientId", mqttClientId, mqttClientId);
-  Serial.println(mqttClientId);
-
-  getOctetsEEPROM("mqttServerIp", 4, octets, octets);
-  for (byte index = 0;  index < 4;  index ++) Serial.println(octets[index]);
-  Serial.println(" ");
-
-  getOctetsEEPROM("networkIp", 4, octets, octets);
-  for (byte index = 0;  index < 4;  index ++) Serial.println(octets[index]);
-  Serial.println(" ");
-
-  getOctetsEEPROM("networkGateway", 4, octets, octets);
-  for (byte index = 0;  index < 4;  index ++) Serial.println(octets[index]);
-  Serial.println(" ");
-
-  getOctetsEEPROM("networkMac", 6, octets, octets);
-  for (byte index = 0;  index < 6;  index ++) Serial.println(octets[index], HEX);
-  Serial.println(" ");
-
-  getOctetsEEPROM("networkNetmask", 4, octets, octets);
-  for (byte index = 0;  index < 4;  index ++) Serial.println(octets[index]);
-  Serial.println(" ");
 }
 
 void commandLock(void) {

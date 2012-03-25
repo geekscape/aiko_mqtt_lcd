@@ -28,15 +28,17 @@ byte lcdInitialized = false;
 unsigned long lcdClearFieldCounter = LONG_MAX;
 
 void lcdInitialize(void) {
-  pinMode(PIN_LCD_BACKLIGHT, OUTPUT);
+  if (! lcdInitialized) {
+    pinMode(PIN_LCD_BACKLIGHT, OUTPUT);
 
-  lcd.begin(16, 2);
-  lcd.setCursor(0, 0);
-  lcd.print("aiko_mqtt_lcd v0");
+    lcd.begin(16, 2);
+    lcd.setCursor(0, 0);
+    lcd.print("aiko_mqtt_lcd v0");
 
-  lcdInitialized = true;
+    LCD_BACKLIGHT(true);
 
-  LCD_BACKLIGHT(true);
+    lcdInitialized = true;
+  }
 }
 
 void lcdHandler(void) {

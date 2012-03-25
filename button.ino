@@ -41,9 +41,11 @@ byte buttonIndex = 0;                         // Current button pressed or 0
 byte buttonInitialized = false;
 
 void buttonInitialize(void) {
-  digitalWrite(PIN_BUTTONS, LOW);             // Ensure internal pull-up is off
+  if (! buttonInitialized) {
+    digitalWrite(PIN_BUTTONS, LOW);           // Ensure internal pull-up is off
 
-  buttonInitialized = true;
+    buttonInitialized = true;
+  }
 }
 
 void buttonHandler(void) {

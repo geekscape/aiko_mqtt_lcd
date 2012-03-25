@@ -13,8 +13,21 @@
  * - Comment-out serial console debugging diagnostics, when finished.
  */
 
+byte eventInitialized = false;
+
+void eventInitialize(void) {
+  if (! eventInitialized) {
+    lcdInitialize();
+    serialInitialize();
+
+    eventInitialized = true;
+  }
+}
+
 void eventLog(
   char message[]) {
+
+  if (! eventInitialized) eventInitialize();
 
   Serial.println(message);
   lcd.setCursor(0,1);

@@ -63,10 +63,10 @@ void serialInputHandler(void) {
 
 #ifdef EEPROM_LOADER
 
-#define ERROR_TIMEOUT       "(error timeout)"
-#define ERROR_BAD_MESSAGE   "(error bad-message)"
-#define ERROR_BAD_COMMAND   "(error bad-command)"
-#define ERROR_BAD_PARAMETER "(error bad-parameter)"
+#define ERROR_TIMEOUT      "(error timeout)"
+#define ERROR_BAD_MESSAGE  "(error bad-message)"
+#define ERROR_BAD_COMMAND  "(error bad-command)"
+#define ERROR_BAD_ARGUMENT "(error bad-argument)"
 
 static const byte  NUL   = 0x00;  // Null character
 static const byte  STX   = 0x02;  // Start of TeXt
@@ -87,31 +87,31 @@ byte messageLength = 0;
 byte messageIndex;
 
 void (*commandHandlers[])() = {
-  commandClear,
   commandDelete,
   commandGet,
   commandLock,
   commandPut,
   commandReset,
+  commandSetup,
   commandUnlock,
   commandVerify
 };
 
 char* commands[] = {
-  "clear",
   "delete",
   "get",
   "lock",
   "put",
   "reset",
+  "setup",
   "unlock",
   "verify"
 };
 
-int commandCount = sizeof(commands) / sizeof(*commands);
+byte commandCount = sizeof(commands) / sizeof(*commands);
 
-int parametersCount[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-int parameterIndex;
+byte argumentsCount[] = { 0, 1, 0, 0, 0, 0, 0, 0 };
+byte argumentIndex;
 
 void serialWelcome(void) {
   Serial.println("[aiko_mqtt_lcd 0.0] EEPROM loader");
@@ -175,7 +175,7 @@ void parseMessage() {
   else {
     skipWhitespace();  // updates messageIndex
 
-    int command = parseCommand();
+    byte command = parseCommand();
     
     if (command < 0) {
       replyError(ERROR_BAD_COMMAND);  // invalid command
@@ -183,8 +183,8 @@ void parseMessage() {
     else {
       skipWhitespace();  // updates messageIndex
 
-      if (parseParameters(parametersCount[command]) == false) {
-        replyError(ERROR_BAD_PARAMETER);  // invalid parameters
+      if (parseArguments(argumentsCount[command]) == false) {
+        replyError(ERROR_BAD_ARGUMENT);  // invalid arguments
       }
       else {
         skipWhitespace();  // updates messageIndex
@@ -221,12 +221,12 @@ boolean checkForCharacter(
   return(false);  // expected character not found
 }
 
-int parseCommand() {
-  int commandIndex = messageIndex;
+byte parseCommand() {
+  byte commandIndex = messageIndex;
 
   parseToken();  // updates messageIndex
   
-  for (int command = 0; command < commandCount; command ++) {
+  for (byte command = 0; command < commandCount; command ++) {
     if (stringCompare(commands[command], & message[commandIndex])) {
       return(command);  // valid command found
     }
@@ -235,26 +235,26 @@ int parseCommand() {
   return(-1);  // invalid command
 }
 
-boolean parseParameters(
-  int expectedParameterCount) {
+boolean parseArguments(
+  byte expectedArgumentCount) {
 
-  parameterIndex = messageIndex;
+  argumentIndex = messageIndex;
 
-  int parameterCount = 0;
+  byte argumentCount = 0;
   
   while (parseToken() > 0) {  // updates messageIndex
-    parameterCount ++;
+    argumentCount ++;
     
     skipWhitespace();
   }
   
-  if (parameterCount == 0) parameterIndex = -1;
+  if (argumentCount == 0) argumentIndex = -1;
     
-  return(expectedParameterCount == parameterCount);  // valid parameter count ?
+  return(expectedArgumentCount == argumentCount);    // valid argument count ?
 }
 
-int parseToken() {
-  int tokenIndex = messageIndex;
+byte parseToken() {
+  byte tokenIndex = messageIndex;
 
   while (messageIndex < messageLength) {
     if (stringDelimiter(message[messageIndex])) break;
@@ -268,7 +268,7 @@ boolean stringCompare(
   char source[],
   char target[]) {
 
-  int index = 0;
+  byte index = 0;
 
   while (stringDelimiter(source[index]) == false  ||
          stringDelimiter(target[index]) == false) {
@@ -299,11 +299,12 @@ void replyError(
 byte serialInitialized = false;
 
 void serialInitialize(void) {
-  Serial.begin(DEFAULT_BAUD_RATE);
+  if (! serialInitialized) {
+    Serial.begin(DEFAULT_BAUD_RATE);
+    serialWelcome();
 
-  serialInitialized = true;
-
-  serialWelcome();
+    serialInitialized = true;
+  }
 }
 
 void serialHandler(void) {

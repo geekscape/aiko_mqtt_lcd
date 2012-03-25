@@ -41,6 +41,8 @@ using namespace Aiko;
 #include "aiko_mqtt_lcd.h"
 
 void setup(void) {
+  eepromInitialize();
+
   Events.addHandler(buttonHandler,  100);
   Events.addHandler(clockHandler,  1000);
   Events.addHandler(lcdHandler,     100);

@@ -7,7 +7,7 @@
  * Description
  * ~~~~~~~~~~~
  * Turn analog input for button resistor ladder into a "buttonIndex".
- * When the button is pressed down, fire an associated event.
+ * When the button is pressed down, then fire an associated event.
  *
  * To Do
  * ~~~~~

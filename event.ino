@@ -10,6 +10,7 @@
  *
  * To Do
  * ~~~~~
+ * - Event should publish to MQTT topic (stored in EEPROM).
  * - Comment-out serial console debugging diagnostics, when finished.
  */
 
@@ -29,7 +30,8 @@ void eventLog(
 
   if (! eventInitialized) eventInitialize();
 
-  Serial.println(message);
+  Serial.println(message);  // AAG: Sent to MQTT if connected !
+
   lcd.setCursor(0,1);
   lcd.print("                ");
   lcd.setCursor(0,1);

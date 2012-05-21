@@ -17,7 +17,7 @@
  * - Break-out Keyboard simulator and EEPROM loader into separate .ino files.
  * - Or combine Keyboard simulator and EEPROM loader ...
  *   - Refactor Serial functions: Provide available(), read() and pushback().
- * - Break-out readMessage() and parseMessage() into separate .ino files.
+ * - Break-out readMessage() and parseMessage() into separate .ino files.  // AAG
  * - Consolidate with existing Aiko serial command handling / parsing.
  */
 
@@ -88,33 +88,39 @@ byte messageIndex;
 
 void (*commandHandlers[])() = {
   commandDelete,
+  commandDump,
   commandGet,
   commandLock,
   commandPut,
   commandReset,
   commandSetup,
   commandUnlock,
-  commandVerify
+  commandVerify,
+  commandWipe
 };
 
 char* commands[] = {
   "delete",
+  "dump",
   "get",
   "lock",
   "put",
   "reset",
   "setup",
   "unlock",
-  "verify"
+  "verify",
+  "wipe"
 };
 
 byte commandCount = sizeof(commands) / sizeof(*commands);
 
-byte argumentsCount[] = { 0, 1, 0, 0, 0, 0, 0, 0 };
+byte argumentsCount[] = { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 };
 byte argumentIndex;
 
 void serialWelcome(void) {
   Serial.println("[aiko_mqtt_lcd 0.0] EEPROM loader");
+  Serial.print("Free RAM: ");
+  Serial.println(freeRAM());   // AAG: Recover RAM, use PROGMEM for Serial.print("literal")
 }
 
 void serialInputHandler(void) {

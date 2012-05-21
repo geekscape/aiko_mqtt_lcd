@@ -31,6 +31,7 @@
  *
  * To Do
  * ~~~~~
+ * - Extract common Event, MQTT, Serial code out of application and into Aikoframework.
  * - Events.addHandler(lcdHandler, rate) ... rate loaded from EEPROM ?
  */
 
@@ -43,11 +44,12 @@ using namespace Aiko;
 void setup(void) {
   eepromInitialize();
 
-  Events.addHandler(buttonHandler,  100);
-  Events.addHandler(clockHandler,  1000);
-  Events.addHandler(lcdHandler,     100);
-  Events.addHandler(mqttHandler,    250);                // ToDo: Adjust timing
-  Events.addHandler(serialHandler,  100);
+  Events.addHandler(buttonHandler,    100);
+  Events.addHandler(clockHandler,    1000);
+  Events.addHandler(lcdHandler,       100);
+  Events.addHandler(throbberHandler,  250);
+  Events.addHandler(mqttHandler,      250);                // ToDo: Adjust timing
+  Events.addHandler(serialHandler,    100);
 }
 
 void loop(void) {
@@ -65,7 +67,7 @@ void clockHandler(void) {
 /* ------------------------------------------------------------------------- */
 // http://jeelabs.org/2011/05/22/atmega-memory-use
 
-int freeRam(void) {
+int freeRAM(void) {
   extern int __heap_start, *__brkval; 
   int v; 
   return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 

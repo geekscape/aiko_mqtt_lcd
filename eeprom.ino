@@ -15,6 +15,7 @@
  * - Use EEPROM struct for magic number, length, Ethernet, MQTT and checksum ?
  * - Commands ...
  *   - (delete key)    - Remove value from EEPROM.
+ *   - (dump)          - Print EEPROM values.  // AAG as key/value pairs
  *   - (get key)       - Return value from EEPROM, key can be "all".
  *   - (lock secret)   - Prevent system control of Arduino.
  *   - (put key value) - Store value in EEPROM.
@@ -22,6 +23,7 @@
  *   - (setup)         - Initialize EEPROM keys / values.
  *   - (unlock secret) - Allow system control of Arduino.
  *   - (verify)        - Verify EEPROM.
+ *   - (wipe)          - Wipe out EEPROM
  * - Store ...
  *   - Ethernet: Mac address, IP address, network mask, gateway address.
  *   - MQTT server: Host address, port, client id
@@ -32,6 +34,7 @@
  */
 
 #include <avr/eeprom.h>
+#include <EEPROM.h>  // Only used by commandWipe()
 
 // EEPROM macros: http://projectgus.com/2010/07/eeprom-access-with-arduino
 
@@ -45,7 +48,7 @@
 
 #define MIN(x,y) ( x > y ? y : x )
 
-static const long EEPROM_MAGIC = 0xcafe;
+static const long EEPROM_MAGIC = 0xdada0000;  // AAG: Include 4 byte application UUID
 
 struct __eeprom_data {
   long magic;
@@ -82,6 +85,14 @@ void commandDelete(void) {
   eventLog("delete()");
 }
 
+void commandDump(void) {
+  for (byte index = 0;  index < sizeof(__eeprom_data);  index ++) {
+    Serial.print(index);
+    Serial.print(": ");
+    Serial.println(EEPROM.read(index), HEX);
+  }
+}
+
 void commandGet(void) {
   eventLog("get()");
 
@@ -96,11 +107,11 @@ void commandPut(void) {
   eventLog("put()");
 }
 
-void commandReset(void) {
+void commandReset(void) {  // AAG: Implement
   eventLog("reset()");
 }
 
-void commandSetup(void) {
+void commandSetup(void) {  // AAG: Should cause commandReset()
   eeprom_write(  0,                resetCount);
   eeprom_write(& MQTT_CLIENT_ID,   mqttClientId);
   eeprom_write(& MQTT_SERVER_IP,   mqttServerIp);
@@ -112,7 +123,7 @@ void commandSetup(void) {
   eeprom_write(  EEPROM_MAGIC,     magic);
 
   eventLog("Setup EEPROM");           // EEPROM serial baud-rate must be setup
-  delay(1000);                        // Ensure LCD message can be seen briefly
+  delay(1000);                        // Ensure LCD message can be seen briefly  // AAG: No delay()s
 }
 
 void commandUnlock(void) {
@@ -121,6 +132,12 @@ void commandUnlock(void) {
 
 void commandVerify(void) {
   eventLog("verify()");
+}
+
+void commandWipe(void) {
+  eventLog("wipe()");
+
+  for (byte index = 0;  index < sizeof(__eeprom_data);  index ++) EEPROM.write(index, 255);
 }
 
 int getIntEEPROM(                                 // ToDo: Error return value ?
@@ -143,7 +160,7 @@ void getOctetsEEPROM(                             // ToDo: Error return value ?
 
   String keyString = String(key);
 
-  if (keyString == "mqttServerIp")   eeprom_read(value1, mqttServerIp);
+  if (keyString == "mqttServerIp")   eeprom_read(value1, mqttServerIp);  // AAG: Yuk !
   if (keyString == "networkIp")      eeprom_read(value1, networkIp);
   if (keyString == "networkGateway") eeprom_read(value1, networkGateway);
   if (keyString == "networkMac")     eeprom_read(value1, networkMac);

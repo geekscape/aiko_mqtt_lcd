@@ -38,7 +38,7 @@ void lcdCreateCustomCharacter(
   byte identifier,
   const char bitMap[]) {
 
-  lcd.command(0x40 || (identifier << 3));
+  lcd.command(0x40 + (identifier << 3));
   for (byte index = 0;  index < 8;  index ++) lcd.write(bitMap[index]);
   lcd.command(0x80);
 }

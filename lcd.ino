@@ -38,7 +38,7 @@ void lcdCreateCustomCharacter(
   byte identifier,
   const char bitMap[]) {
 
-  lcd.command(0x40 + identifier);
+  lcd.command(0x40 || (identifier << 3));
   for (byte index = 0;  index < 8;  index ++) lcd.write(bitMap[index]);
   lcd.command(0x80);
 }
@@ -48,7 +48,7 @@ void lcdInitialize(void) {
     pinMode(PIN_LCD_BACKLIGHT, OUTPUT);
 
     lcd.begin(16, 2);
-    lcdCreateCustomCharacter(0, bitmapBackslash);
+    lcdCreateCustomCharacter(7, bitmapBackslash);       // last custom character
     lcd.setCursor(0, 0);
     lcd.print("aiko_mqtt_lcd");
 
@@ -72,13 +72,13 @@ void lcdHandler(void) {
 byte throbberEnabled = false;
 byte throbberIndex = 0;
 
-char throbber[] = "|/-\0|/-\0";     // "\0" is the first custom character
+char throbber[] = "|/-\7";                  // "\7" is the last custom character
 
 void throbberHandler(void) {
   char throb = (throbberEnabled == true)  ?  throbber[throbberIndex]  :  '?';
   lcd.setCursor(15, 0);
   lcd.print(throb);
-  cycleIncrement(throbberIndex, 1, 8);
+  cycleIncrement(throbberIndex, 1, 4);
 }
 
 /* ------------------------------------------------------------------------- */

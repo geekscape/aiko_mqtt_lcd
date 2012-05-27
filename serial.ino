@@ -10,7 +10,7 @@
  *
  * To Do
  * ~~~~~
- * - Get Serial.begin(BAUD_RATE) from EEPROM.
+ * - Get Serial.begin(DEFAULT_BAUD_RATE) from EEPROM.
  * - Use #define for "[aiko_mqtt_lcd 0.0]".
  * - Use PROGMEM for literal strings.
  * - Refactor EEPROM loader readMessage() to be independent of Serial functions.
